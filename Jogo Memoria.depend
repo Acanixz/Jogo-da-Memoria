@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1654821155 source:c:\users\7828845\desktop\09 06 2022\jogo memoria\main.cpp
+	<iostream>
+	<time.h>
+	<windows.h>
+	<conio.h>
+	<stdlib.h>
+	<locale>
+
