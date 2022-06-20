@@ -27,11 +27,12 @@ int main()
 
         system("cls");
 
-        /// DESENHO DA TELA INICIAL
+        /// DESENHO DAS BORDAS
         cout<<"-------------------------------------------------------------------------------------------------------------------";
         cout<<"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
         cout<<"-------------------------------------------------------------------------------------------------------------------";
 
+        /// DESENHO DA CARTA
         coord.X = 35;    coord.Y = 8;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         cout<<"Jogo da Memória";
@@ -51,6 +52,14 @@ int main()
         coord.X = 37;    coord.Y = 13;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         cout<<"3 - Dificil";
+
+        coord.X = 25;    coord.Y = 20;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"Herick Bittencourt e Vinicius Ribeiro";
+
+        coord.X = 40;    coord.Y = 19;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"2022";
 
         coord.X = 70;    coord.Y = 1;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
