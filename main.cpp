@@ -27,7 +27,15 @@ int main()
 
         int matrizOriginal[4][4] = {0};
         int matrizGabarito[4][4];
-        int availableIndexes[1] = {1};
+        int matrizJogo[4][4];
+
+        for (int i = 0; i < 4; i++){
+            for (int j = 0; j < 4; j++){
+                matrizJogo[i][j] = -1;
+            }
+        }
+
+        int tentativasRestantes = 0, tentativasUtilizadas = 0, paresEncontrados = 0;
 
         bool debugModeEnabled = true;
 
@@ -39,7 +47,7 @@ int main()
             cout<<"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
             cout<<"-------------------------------------------------------------------------------------------------------------------";
 
-            /// DESENHO DA CARTA
+            /// DESENHO DO MENU
             coord.X = 35;    coord.Y = 8;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"Jogo da Memória";
@@ -74,6 +82,7 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"2022";
 
+            /// DESENHO DA CARTA
             coord.X = 80;    coord.Y = 1;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<" _______________________ " << endl;
@@ -151,6 +160,18 @@ int main()
             coord.X = 42;    coord.Y = 15;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cin >> difficultySelected;
+        }
+
+        switch (difficultySelected){
+        case 1:
+            tentativasRestantes = 24;
+            break;
+        case 2:
+            tentativasRestantes = 18;
+            break;
+        case 3:
+            tentativasRestantes = 11;
+            break;
         }
 
         int randX = 0, randY = 0;
@@ -252,6 +273,133 @@ int main()
                 cout << endl;
             }
             system("pause");
+            system("cls");
+        }
+
+        /// DESENHO DAS BORDAS
+        cout<<"-------------------------------------------------------------------------------------------------------------------";
+        cout<<"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+        cout<<"-------------------------------------------------------------------------------------------------------------------";
+
+        /// DESENHO DA TABELA
+        coord.X = 50;    coord.Y = 6;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<" ______________ " << endl;
+
+        for (int i = 0; i < 8; i++){
+            coord.Y = coord.Y+1;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"|              |" << endl;
+        }
+
+        coord.Y = coord.Y+1;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"|______________|" << endl;
+
+        while (paresEncontrados < 8 && tentativasRestantes > 0){
+            coord.X = 53;    coord.Y = 8;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            for (int i = 0; i < 4; i++){
+                for (int j = 0; j < 4; j++){
+                    if (matrizJogo[i][j] == -1){
+                        cout << "?  ";
+                    } else {
+                        cout << matrizJogo[i][j] << "  ";
+                    }
+                }
+                coord.Y += 2;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            }
+
+            coord.X = 51;    coord.Y = 2;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Jogo da Memória";
+
+            coord.X = 48;    coord.Y = 4;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Jogadas realizadas: " << tentativasUtilizadas << "   ";
+
+            coord.X = 47;    coord.Y = 5;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Tentativas restantes: " << tentativasRestantes << "   ";
+
+            int chosenCoordinates[2][2] = {0};
+
+            for (int i = 0; i < 2; i++){
+                for (int j = 0; j < 2; j++){
+                    do {
+                        coord.X = 45;    coord.Y = 17;
+                        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                        cout<<"Escolha a ";
+                        switch (j){
+                        case 0:
+                            cout << "linha da " << i+1 << "° carta ";
+                            break;
+
+                        case 1:
+                            cout << "coluna da " << i+1 << "° carta";
+                            break;
+                        }
+
+                        if (chosenCoordinates[i][j] < 0 || chosenCoordinates[i][j] > 4){
+                            coord.X = 44;    coord.Y = 20;
+                            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                            cout<<"Opção invalida, tente novamente";
+                        } else {
+                            coord.X = 44;    coord.Y = 20;
+                            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                            cout<<"                                                  ";
+                        }
+
+                        coord.X = 58;    coord.Y = 18;
+                        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                        cout<<"            ";
+                        coord.X = 58;
+                        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                        cin >> chosenCoordinates[i][j];
+                    } while (chosenCoordinates[i][j] < 1 || chosenCoordinates[i][j] > 4);
+                }
+            }
+
+            for (int i = 0; i < 2; i++){
+                for (int j = 0; j < 2; j++){
+                    chosenCoordinates[i][j]--;
+                }
+            }
+
+            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
+            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
+
+            coord.X = 53;    coord.Y = 8;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            for (int i = 0; i < 4; i++){
+                for (int j = 0; j < 4; j++){
+                    if (matrizJogo[i][j] == -1){
+                        cout << "?  ";
+                    } else {
+                        cout << matrizJogo[i][j] << "  ";
+                    }
+                }
+                coord.Y += 2;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            }
+
+            Sleep(500);
+
+            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = -1;
+            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = -1;
+
+            if (matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]]){
+                if (chosenCoordinates[0][0] != chosenCoordinates[1][0] || chosenCoordinates[0][1] != chosenCoordinates[1][1]){
+                    if (matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == -1 && matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] == -1){
+                        tentativasRestantes += 1000;
+                        matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
+                        matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
+                    }
+                }
+            }
+            tentativasRestantes--;
+            tentativasUtilizadas++;
         }
         isPlaying = false;
     }
