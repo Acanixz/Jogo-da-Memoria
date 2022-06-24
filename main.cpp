@@ -296,6 +296,7 @@ int main()
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         cout<<"|______________|" << endl;
 
+        string errorType = "";
         while (paresEncontrados < 8 && tentativasRestantes > 0){
             coord.X = 53;    coord.Y = 8;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
@@ -323,8 +324,20 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"Tentativas restantes: " << tentativasRestantes << "   ";
 
-            int chosenCoordinates[2][2] = {0};
+            coord.X = 48;    coord.Y = 20;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Pares encontrados: " << paresEncontrados;
 
+            int chosenCoordinates[2][2] = {0};
+            if (errorType != ""){
+                coord.X = 70;    coord.Y = 11;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                cout << "                                             ";
+                coord.X = 70;    coord.Y = 11;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                cout << errorType;
+                errorType = "";
+            }
             for (int i = 0; i < 2; i++){
                 for (int j = 0; j < 2; j++){
                     do {
@@ -342,13 +355,12 @@ int main()
                         }
 
                         if (chosenCoordinates[i][j] < 0 || chosenCoordinates[i][j] > 4){
-                            coord.X = 44;    coord.Y = 20;
+                            coord.X = 70;    coord.Y = 11;
                             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-                            cout<<"Opção invalida, tente novamente";
-                        } else {
-                            coord.X = 44;    coord.Y = 20;
+                            cout << "                                             ";
+                            coord.X = 70;    coord.Y = 11;
                             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-                            cout<<"                                                  ";
+                            cout << "Opção invalida, tente novamente";
                         }
 
                         coord.X = 58;    coord.Y = 18;
@@ -356,6 +368,7 @@ int main()
                         cout<<"            ";
                         coord.X = 58;
                         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                        while(kbhit()) getch(); /// Solução para buffer não-intencional
                         cin >> chosenCoordinates[i][j];
                     } while (chosenCoordinates[i][j] < 1 || chosenCoordinates[i][j] > 4);
                 }
@@ -366,7 +379,7 @@ int main()
                     chosenCoordinates[i][j]--;
                 }
             }
-
+            int OriginalValues[2] = {matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]], matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]]};
             matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
             matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
 
@@ -384,24 +397,108 @@ int main()
                 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             }
 
-            Sleep(500);
+            coord.X = 70;    coord.Y = 13;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout << "Revelando..";
+            switch (difficultySelected){
+            case 1:
+                Sleep(1500);
+                break;
+            case 2:
+                Sleep(1250);
+                break;
+            case 3:
+                Sleep(1000);
+                break;
+            }
+            coord.X = 70;    coord.Y = 13;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout << "           ";
 
-            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = -1;
-            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = -1;
+            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = OriginalValues[0];
+            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = OriginalValues[1];
 
             if (matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]]){
                 if (chosenCoordinates[0][0] != chosenCoordinates[1][0] || chosenCoordinates[0][1] != chosenCoordinates[1][1]){
                     if (matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == -1 && matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] == -1){
-                        tentativasRestantes += 1000;
+                        paresEncontrados++;
+                        errorType = "Você encontrou um par! :)";
                         matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
                         matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
+                    } else {
+                        errorType = "Esse par escolhido já foi revelado!";
                     }
+
+                } else {
+                    errorType = "Você não pode escolher a mesma carta!";
                 }
+
+            } else {
+                errorType = "Você não achou o par :(";
             }
             tentativasRestantes--;
             tentativasUtilizadas++;
         }
-        isPlaying = false;
+
+        system("cls");
+        /// DESENHO DAS BORDAS
+        cout<<"-------------------------------------------------------------------------------------------------------------------";
+        cout<<"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+        cout<<"-------------------------------------------------------------------------------------------------------------------";
+
+        coord.Y = 8;
+        if (paresEncontrados >= 8){
+            coord.X = 51;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Você encontrou todos os pares!";
+        } else {
+            coord.X = 45;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout<<"Você não encontrou todos os pares :(";
+        }
+
+        coord.X = 51;    coord.Y = 9;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"O que deseja fazer?";
+
+        coord.Y = 11;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"1 - Tentar denovo";
+
+        coord.Y++;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"2 - Voltar ao menu";
+
+        coord.Y++;
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+        cout<<"3 - Sair";
+
+        int endChosenOption = 0;
+
+        do {
+            coord.X = 60;    coord.Y += 2;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            cout << "         ";
+            coord.X = 60;    coord.Y += 2;
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+            while(kbhit()) getch(); /// Solução para buffer não-intencional
+            cin >> endChosenOption;
+
+            if (endChosenOption < 0 || endChosenOption > 3) {
+                coord.X = 70;    coord.Y = 11;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                cout << "Opção invalida, tente novamente";
+            }
+        } while (endChosenOption < 1 || endChosenOption > 3);
+
+        switch (endChosenOption){
+        case 2:
+            difficultySelected = 0;
+            break;
+        case 3:
+            isPlaying = false;
+            break;
+        }
     }
     return 0;
 }
