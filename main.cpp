@@ -33,14 +33,7 @@ int main()
 
         int matrizOriginal[4][4] = {0};
         int matrizGabarito[4][4];
-        int matrizJogo[4][4];
-
-        for (int i = 0; i < 4; i++){
-            for (int j = 0; j < 4; j++){
-                matrizJogo[i][j] = -1; /// Valores não encontrados são definidos como -1 inicialmente
-            }
-        }
-        /// TO-DO: será que tem problema definir a matrizJogo com {0}?
+        int matrizJogo[4][4] = {0};
 
         int tentativasRestantes = 24, tentativasUtilizadas = 0, paresEncontrados = 0;
 
@@ -314,7 +307,7 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             for (int i = 0; i < 4; i++){ /// DESENHO DAS CARTAS
                 for (int j = 0; j < 4; j++){
-                    if (matrizJogo[i][j] == -1){ /// CARTA CUJO PAR NÃO FOI ENCONTRADO
+                    if (matrizJogo[i][j] == 0){ /// CARTA CUJO PAR NÃO FOI ENCONTRADO
                         cout << "?  ";
                     } else { /// CARTA COM PAR ENCONTRADO
                         cout << matrizJogo[i][j] << "  ";
@@ -415,7 +408,7 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             for (int i = 0; i < 4; i++){ /// RE-DESENHANDO CARTAS (REVELANDO AS CARTAS ESCOLHIDAS)
                 for (int j = 0; j < 4; j++){
-                    if (matrizJogo[i][j] == -1){
+                    if (matrizJogo[i][j] == 0){
                         cout << "?  ";
                     } else {
                         cout << matrizJogo[i][j] << "  ";
@@ -450,7 +443,7 @@ int main()
             /// RESULTADO
             if (matrizGabarito[Escolha_1x][Escolha_1y] == matrizGabarito[Escolha_2x][Escolha_2y]){ /// Cartas escolhidas são pares?
                 if (Escolha_1x != Escolha_2x || Escolha_1y != Escolha_2y){ /// Cartas são diferentes?
-                    if (matrizJogo[Escolha_1x][Escolha_1y] == -1 && matrizJogo[Escolha_2x][Escolha_2y] == -1){ /// Cartas são pares novos?
+                    if (matrizJogo[Escolha_1x][Escolha_1y] == 0 && matrizJogo[Escolha_2x][Escolha_2y] == 0){ /// Cartas são pares novos?
                         paresEncontrados++;
                         errorType = "Você encontrou um par! :)";
                         matrizJogo[Escolha_1x][Escolha_1y] = matrizGabarito[Escolha_1x][Escolha_1y];
