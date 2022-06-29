@@ -1,3 +1,8 @@
+/** Jogo da memória, desenvolvido por:
+- Hérick Vitor Vieira Bittencourt
+- Vinicius Henrique Ribeiro
+*/
+
 #include <iostream>
 #include <time.h>
 #include <windows.h>
