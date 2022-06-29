@@ -19,8 +19,9 @@ int main()
     setlocale(LC_ALL, "Portuguese");
     srand(time(NULL));
 
-    int difficultySelected = 0;
-    bool isPlaying = true;
+    int difficultySelected = 0; /// Dificuldade maior = Menos tempo de revelação das cartas
+    bool isPlaying = true; /// Loop principal
+    bool debugModeEnabled = false; /// Informa geração de tabela ao começar o jogo
 
     while (isPlaying){
         cout << "Carregando.." << endl;
@@ -31,13 +32,12 @@ int main()
 
         for (int i = 0; i < 4; i++){
             for (int j = 0; j < 4; j++){
-                matrizJogo[i][j] = -1;
+                matrizJogo[i][j] = -1; /// Valores não encontrados são definidos como -1 inicialmente
             }
         }
+        /// TO-DO: será que tem problema definir a matrizJogo com {0}?
 
-        int tentativasRestantes = 0, tentativasUtilizadas = 0, paresEncontrados = 0;
-
-        bool debugModeEnabled = true;
+        int tentativasRestantes = 24, tentativasUtilizadas = 0, paresEncontrados = 0;
 
         while (difficultySelected < 1 || difficultySelected > 3){
             system("cls");
@@ -68,10 +68,20 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"3 - Dificil";
 
-            if (difficultySelected < 0 || difficultySelected > 3){
+            if (difficultySelected < 0 || difficultySelected > 3){ /// AVISO DE ENTRADA DE DADOS INVALIDA
                 coord.X = 25;    coord.Y = 17;
                 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                 cout<<"Dificuldade invalida, digite novamente";
+            }
+
+            if (debugModeEnabled == false){ /// AVISO DE DEBUG ATIVADO
+                coord.X = 1;    coord.Y = 1;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                cout<<"          ";
+            } else {
+                coord.X = 1;    coord.Y = 1;
+                SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+                cout<<"MODO DEBUG";
             }
 
             coord.X = 25;    coord.Y = 20;
@@ -82,7 +92,7 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"2022";
 
-            /// DESENHO DA CARTA
+            /// DESENHO DA CARTA (ASCII Art do Menu)
             coord.X = 80;    coord.Y = 1;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<" _______________________ " << endl;
@@ -159,23 +169,20 @@ int main()
 
             coord.X = 42;    coord.Y = 15;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-            cin >> difficultySelected;
-        }
+            cin >> difficultySelected; /// ENTRADA DE DADOS
 
-        switch (difficultySelected){
-        case 1:
-            tentativasRestantes = 24;
-            break;
-        case 2:
-            tentativasRestantes = 18;
-            break;
-        case 3:
-            tentativasRestantes = 11;
-            break;
+            if (difficultySelected == 256){ /// LEITURA PARA DEBUG MODE
+                difficultySelected = 0;
+                if (debugModeEnabled == false){
+                    debugModeEnabled = true;
+                } else {
+                    debugModeEnabled = false;
+                }
+            }
         }
 
         int randX = 0, randY = 0;
-        for (int i = 1; i <= 8; i++){
+        for (int i = 1; i <= 8; i++){ /// POSICIONAMENTO ALEATÓRIO DE PARES NA MATRIZ ORIGINAL
             system("cls");
 
             coord.X = 35;    coord.Y = 8;
@@ -185,11 +192,11 @@ int main()
             do{
                 randX = rand()%4;
                 randY = rand()%4;
-                if (matrizOriginal[randX][randY] == 0){
+                if (matrizOriginal[randX][randY] == 0){ /// Coordenada livre?
                     matrizOriginal[randX][randY] = i;
                     numbersPlaced++;
                 }
-            } while(numbersPlaced < 2);
+            } while(numbersPlaced < 2); /// Repita até que seja colocado duas vezes
         }
 
         system("cls");
@@ -199,22 +206,22 @@ int main()
         cout<< "Aleatorizando matriz..";
         int tipoMatriz = 1 + rand()%4;
 
-        switch (tipoMatriz){
-        default:
+        switch (tipoMatriz){ /// CRIAÇÃO DA MATRIZ GABARITO
+        default: /// Normal
             for (int i = 0; i < 4; i++){
                 for (int j = 0; j < 4; j++){
                     matrizGabarito[i][j] = matrizOriginal[i][j];
                 }
             }
             break;
-        case 2:
+        case 2: /// Transposta
             for (int i = 0; i < 4; i++){
                 for (int j = 0; j < 4; j++){
                     matrizGabarito[i][j] = matrizOriginal[j][i];
                 }
             }
             break;
-        case 3:
+        case 3: /// Invertida por linha
             for (int i = 0; i < 4; i++){
                 for (int j = 0; j < 4; j++){
                     switch (i){
@@ -234,7 +241,7 @@ int main()
                 }
             }
             break;
-        case 4:
+        case 4: /// Invertida por coluna
             for (int i = 0; i < 4; i++){
                 for (int j = 0; j < 4; j++){
                     switch (j){
@@ -257,7 +264,7 @@ int main()
         }
 
         system("cls");
-        if (debugModeEnabled == true){
+        if (debugModeEnabled == true){ /// DEMONSTRAÇÃO DA GERAÇÃO
             cout << "Tipo de matriz gabarito: " << tipoMatriz << endl << endl << "Original: " << endl;
             for (int i = 0; i < 4; i++){
                 for (int j = 0; j < 4; j++){
@@ -297,21 +304,22 @@ int main()
         cout<<"|______________|" << endl;
 
         string errorType = "";
-        while (paresEncontrados < 8 && tentativasRestantes > 0){
+        while (paresEncontrados < 8 && tentativasRestantes > 0){ /// LOOP DO JOGO
             coord.X = 53;    coord.Y = 8;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-            for (int i = 0; i < 4; i++){
+            for (int i = 0; i < 4; i++){ /// DESENHO DAS CARTAS
                 for (int j = 0; j < 4; j++){
-                    if (matrizJogo[i][j] == -1){
+                    if (matrizJogo[i][j] == -1){ /// CARTA CUJO PAR NÃO FOI ENCONTRADO
                         cout << "?  ";
-                    } else {
+                    } else { /// CARTA COM PAR ENCONTRADO
                         cout << matrizJogo[i][j] << "  ";
                     }
                 }
-                coord.Y += 2;
+                coord.Y += 2; /// POSICIONAMENTO DAS CARTAS A CADA LINHA
                 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             }
 
+            /// DESENHO DA UI (User Interface)
             coord.X = 51;    coord.Y = 2;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"Jogo da Memória";
@@ -328,23 +336,24 @@ int main()
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"Pares encontrados: " << paresEncontrados;
 
-            int chosenCoordinates[2][2] = {0};
-            if (errorType != ""){
+            int chosenCoordinates[2][2] = {0}; /// MATRIZ DE ESCOLHA DAS CARTAS (Cada linha = 1 carta)
+            if (errorType != ""){ /// DISPLAY DE AVISOS EXTRAS, CASO EXISTAM
                 coord.X = 70;    coord.Y = 11;
                 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-                cout << "                                             ";
+                cout << "                                             "; /// LIMPEZA DA ÁREA DE AVISOS (EVITAR SOBREPOSIÇÃO)
+
                 coord.X = 70;    coord.Y = 11;
                 SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                 cout << errorType;
                 errorType = "";
             }
-            for (int i = 0; i < 2; i++){
+            for (int i = 0; i < 2; i++){ /// ESCOLHA DE CARTAS
                 for (int j = 0; j < 2; j++){
-                    do {
+                    do { /// LOOP DE ESCOLHA DA COORDENADA
                         coord.X = 45;    coord.Y = 17;
                         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                         cout<<"Escolha a ";
-                        switch (j){
+                        switch (j){ /// DISPLAY BASEADO NA COLUNA SENDO LIDA PELO FOR LOOP
                         case 0:
                             cout << "linha da " << i+1 << "° carta ";
                             break;
@@ -354,10 +363,11 @@ int main()
                             break;
                         }
 
-                        if (chosenCoordinates[i][j] < 0 || chosenCoordinates[i][j] > 4){
+                        if (chosenCoordinates[i][j] < 0 || chosenCoordinates[i][j] > 4){ /// DISPLAY DE ESCOLHA INVALIDA
                             coord.X = 70;    coord.Y = 11;
                             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                             cout << "                                             ";
+
                             coord.X = 70;    coord.Y = 11;
                             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                             cout << "Opção invalida, tente novamente";
@@ -365,27 +375,40 @@ int main()
 
                         coord.X = 58;    coord.Y = 18;
                         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-                        cout<<"            ";
+                        cout<<"            "; /// Limpeza da área de entrada de dados no display
+
                         coord.X = 58;
                         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
                         while(kbhit()) getch(); /// Solução para buffer não-intencional
+
                         cin >> chosenCoordinates[i][j];
                     } while (chosenCoordinates[i][j] < 1 || chosenCoordinates[i][j] > 4);
                 }
             }
 
+            /// Correção das entradas de dados p/ evitar Buffer Overflow (https://pt.wikipedia.org/wiki/Transbordamento_de_dados)
             for (int i = 0; i < 2; i++){
                 for (int j = 0; j < 2; j++){
                     chosenCoordinates[i][j]--;
                 }
             }
-            int OriginalValues[2] = {matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]], matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]]};
-            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
-            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
+
+            /// DEFINIÇÃO DAS COORDENADAS ESCOLHIDAS (Legibilidade) (https://cdn.discordapp.com/attachments/798379839878201374/989876654740471808/unknown.png)
+            int Escolha_1x = chosenCoordinates[0][0];
+            int Escolha_1y = chosenCoordinates[0][1];
+            int Escolha_2x = chosenCoordinates[1][0];
+            int Escolha_2y = chosenCoordinates[1][1];
+
+            /// Buffer para os valores da matriz jogo (evita bug de "desrevelação")
+            int OriginalValues[2] = {matrizJogo[Escolha_1x][Escolha_1y], matrizJogo[Escolha_2x][Escolha_2y]};
+
+            /// REVELAÇÃO DAS CARTAS
+            matrizJogo[Escolha_1x][Escolha_1y] = matrizGabarito[Escolha_1x][Escolha_1y];
+            matrizJogo[Escolha_2x][Escolha_2y] = matrizGabarito[Escolha_2x][Escolha_2y];
 
             coord.X = 53;    coord.Y = 8;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-            for (int i = 0; i < 4; i++){
+            for (int i = 0; i < 4; i++){ /// RE-DESENHANDO CARTAS (REVELANDO AS CARTAS ESCOLHIDAS)
                 for (int j = 0; j < 4; j++){
                     if (matrizJogo[i][j] == -1){
                         cout << "?  ";
@@ -400,31 +423,33 @@ int main()
             coord.X = 70;    coord.Y = 13;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout << "Revelando..";
-            switch (difficultySelected){
+            switch (difficultySelected){ /// Dificuldade -> Tempo de revelação
             case 1:
-                Sleep(1500);
+                Sleep(2000);
                 break;
             case 2:
-                Sleep(1250);
+                Sleep(1500);
                 break;
             case 3:
-                Sleep(1000);
+                Sleep(1250);
                 break;
             }
             coord.X = 70;    coord.Y = 13;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout << "           ";
 
-            matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = OriginalValues[0];
-            matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = OriginalValues[1];
+            /// REVERTER REVELAÇÃO
+            matrizJogo[Escolha_1x][Escolha_1y] = OriginalValues[0];
+            matrizJogo[Escolha_2x][Escolha_2y] = OriginalValues[1];
 
-            if (matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]]){
-                if (chosenCoordinates[0][0] != chosenCoordinates[1][0] || chosenCoordinates[0][1] != chosenCoordinates[1][1]){
-                    if (matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] == -1 && matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] == -1){
+            /// RESULTADO
+            if (matrizGabarito[Escolha_1x][Escolha_1y] == matrizGabarito[Escolha_2x][Escolha_2y]){ /// Cartas escolhidas são pares?
+                if (Escolha_1x != Escolha_2x || Escolha_1y != Escolha_2y){ /// Cartas são diferentes?
+                    if (matrizJogo[Escolha_1x][Escolha_1y] == -1 && matrizJogo[Escolha_2x][Escolha_2y] == -1){ /// Cartas são pares novos?
                         paresEncontrados++;
                         errorType = "Você encontrou um par! :)";
-                        matrizJogo[chosenCoordinates[0][0]][chosenCoordinates[0][1]] = matrizGabarito[chosenCoordinates[0][0]][chosenCoordinates[0][1]];
-                        matrizJogo[chosenCoordinates[1][0]][chosenCoordinates[1][1]] = matrizGabarito[chosenCoordinates[1][0]][chosenCoordinates[1][1]];
+                        matrizJogo[Escolha_1x][Escolha_1y] = matrizGabarito[Escolha_1x][Escolha_1y];
+                        matrizJogo[Escolha_2x][Escolha_2y] = matrizGabarito[Escolha_2x][Escolha_2y];
                     } else {
                         errorType = "Esse par escolhido já foi revelado!";
                     }
@@ -436,9 +461,12 @@ int main()
             } else {
                 errorType = "Você não achou o par :(";
             }
+
+            /// CONTAR TENTATIVA FEITA
             tentativasRestantes--;
             tentativasUtilizadas++;
         }
+        /// JOGO ENCERRADO
 
         system("cls");
         /// DESENHO DAS BORDAS
@@ -447,7 +475,7 @@ int main()
         cout<<"-------------------------------------------------------------------------------------------------------------------";
 
         coord.Y = 8;
-        if (paresEncontrados >= 8){
+        if (paresEncontrados >= 8){ /// CONCLUSÃO
             coord.X = 51;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout<<"Você encontrou todos os pares!";
@@ -457,6 +485,7 @@ int main()
             cout<<"Você não encontrou todos os pares :(";
         }
 
+        /// DESENHO DAS ESCOLHAS
         coord.X = 51;    coord.Y = 9;
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
         cout<<"O que deseja fazer?";
@@ -475,10 +504,11 @@ int main()
 
         int endChosenOption = 0;
 
-        do {
+        do { /// LOOP DE ESCOLHA FINAL
             coord.X = 60;    coord.Y += 2;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             cout << "         ";
+
             coord.X = 60;    coord.Y += 2;
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
             while(kbhit()) getch(); /// Solução para buffer não-intencional
@@ -492,10 +522,11 @@ int main()
         } while (endChosenOption < 1 || endChosenOption > 3);
 
         switch (endChosenOption){
-        case 2:
+        case 2: /// Voltar ao menu
             difficultySelected = 0;
+            debugModeEnabled = false;
             break;
-        case 3:
+        case 3: /// Sair
             isPlaying = false;
             break;
         }
